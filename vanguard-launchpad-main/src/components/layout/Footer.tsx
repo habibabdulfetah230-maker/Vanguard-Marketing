@@ -134,10 +134,10 @@ export const Footer = () => {
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-primary flex-shrink-0" />
                 <a
-                  href="mailto:hello@vanguardmarketing.com"
+                  href="mailto:vanguardmarketing123@gmail.com"
                   className="text-muted-foreground hover:text-foreground transition-colors text-sm"
                 >
-                  hello@vanguardmarketing.com
+                  vanguardmarketing123@gmail.com
                 </a>
               </li>
             </ul>

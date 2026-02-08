@@ -71,7 +71,7 @@ const Privacy = () => {
                 </h2>
                 <p className="text-muted-foreground">
                   If you have any questions about this Privacy Policy, please
-                  contact us at hello@vanguardmarketing.com.
+                  contact us at vanguardmarketing123@gmail.com.
                 </p>
               </div>
             </div>

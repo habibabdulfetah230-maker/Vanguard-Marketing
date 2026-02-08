@@ -32,8 +32,8 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email",
-    details: ["hello@vanguardmarketing.com"],
-    action: "mailto:hello@vanguardmarketing.com",
+    details: ["vanguardmarketing123@gmail.com"],
+    action: "mailto:vanguardmarketing123@gmail.com",
   },
   {
     icon: Clock,

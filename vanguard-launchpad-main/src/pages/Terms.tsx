@@ -83,7 +83,7 @@ const Terms = () => {
                 </h2>
                 <p className="text-muted-foreground">
                   For questions about these Terms of Service, please contact us
-                  at hello@vanguardmarketing.com.
+                  at vanguardmarketing123@gmail.com.
                 </p>
               </div>
             </div>
