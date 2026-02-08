@@ -6,6 +6,8 @@
     "install": "npm install --prefix vanguard-launchpad-main",
     "dev": "npm run dev --prefix vanguard-launchpad-main",
     "server": "npm run server --prefix vanguard-launchpad-main",
-    "server:dev": "npm run server:dev --prefix vanguard-launchpad-main"
+    "server:dev": "npm run server:dev --prefix vanguard-launchpad-main",
+    "render-build": "npm run build --prefix vanguard-launchpad-main",
+    "render-start": "npm run server --prefix vanguard-launchpad-main"
   }
 }
