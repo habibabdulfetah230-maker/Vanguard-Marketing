@@ -8,14 +8,24 @@ let server;
 
 const startServer = async () => {
   try {
-    await connectDatabase();
+    // Try to connect to database, but don't fail if it doesn't work
+    try {
+      await connectDatabase();
+    } catch (dbError) {
+      console.warn("[server] Database connection failed, continuing without database:", dbError.message);
+    }
 
+    // Try to create default admin, but don't fail if database is not connected
     if (env.defaultAdmin.email && env.defaultAdmin.password) {
-      await ensureDefaultAdmin({
-        email: env.defaultAdmin.email,
-        password: env.defaultAdmin.password,
-        name: env.defaultAdmin.name,
-      });
+      try {
+        await ensureDefaultAdmin({
+          email: env.defaultAdmin.email,
+          password: env.defaultAdmin.password,
+          name: env.defaultAdmin.name,
+        });
+      } catch (adminError) {
+        console.warn("[server] Could not create default admin:", adminError.message);
+      }
     }
 
     server = http.createServer(app);
