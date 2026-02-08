@@ -1,0 +1,28 @@
+services:
+  # Web Service (React Frontend + Express Backend)
+  - type: web
+    name: vanguard-marketing
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run server
+    healthCheckPath: /
+    
+    # Environment variables (add these in Render dashboard instead)
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+        
+  # Static File Service (if you want to serve frontend separately)
+  - type: web
+    name: vanguard-marketing-static
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    
+databases:
+  # MongoDB Database
+  - name: vanguard-marketing-db
+    type: mongo
+    ipAllowList: []

@@ -26,7 +26,19 @@ app.get("/health", (_req, res) => {
 
 app.use("/api", routes);
 
-app.use(notFoundHandler);
+// Serve static files in production
+if (env.nodeEnv === "production") {
+  const distPath = path.join(process.cwd(), "dist");
+  app.use(express.static(distPath));
+  
+  // Serve React app for all non-API routes
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+} else {
+  app.use(notFoundHandler);
+}
+
 app.use(errorHandler);
 
 export default app;
