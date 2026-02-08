@@ -7,7 +7,7 @@ services:
     startCommand: cd vanguard-launchpad-main && node server/src/server.js
     healthCheckPath: /
     
-    # Environment variables (add these in Render dashboard instead)
+    # Environment variables
     envVars:
       - key: NODE_ENV
         value: production
@@ -21,6 +21,9 @@ services:
         generateValue: true
       - key: DEFAULT_ADMIN_NAME
         value: Admin
-      # Add your MongoDB Atlas connection string here
-      - key: MONGODB_URI
-        value: your-mongodb-atlas-connection-string
+
+databases:
+  # MongoDB Database (Render will automatically set MONGODB_URI)
+  - name: vanguard-marketing-db
+    type: mongo
+    ipAllowList: []
