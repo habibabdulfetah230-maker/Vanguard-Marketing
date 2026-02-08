@@ -3,10 +3,9 @@ services:
   - type: web
     name: vanguard-marketing
     env: node
-    buildCommand: npm run render-build
-    startCommand: npm run render-start
+    buildCommand: cd vanguard-launchpad-main && npm install && npm run build
+    startCommand: cd vanguard-launchpad-main && node server/src/server.js
     healthCheckPath: /
-    workingDirectory: vanguard-launchpad-main
     
     # Environment variables (add these in Render dashboard instead)
     envVars:
@@ -14,17 +13,3 @@ services:
         value: production
       - key: PORT
         value: 10000
-        
-  # Static File Service (if you want to serve frontend separately)
-  - type: web
-    name: vanguard-marketing-static
-    env: static
-    buildCommand: npm run build
-    staticPublishPath: ./dist
-    workingDirectory: vanguard-launchpad-main
-    
-databases:
-  # MongoDB Database
-  - name: vanguard-marketing-db
-    type: mongo
-    ipAllowList: []
