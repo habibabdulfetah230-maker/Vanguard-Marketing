@@ -140,6 +140,26 @@ const createBrandingItem = (token: string, payload: BrandingItemPayload) => {
   });
 };
 
+const updateBrandingItem = (token: string, id: string, payload: Partial<BrandingItemPayload>) => {
+  const formData = new FormData();
+  if (payload.title) formData.append("title", payload.title);
+  if (payload.description) formData.append("description", payload.description);
+  if (payload.externalLink) formData.append("externalLink", payload.externalLink);
+  if (payload.image) formData.append("image", payload.image);
+
+  return apiFetch<BrandingItemResponse>(`/branding/${id}`, {
+    method: "PATCH",
+    body: formData,
+    token,
+  });
+};
+
+const deleteBrandingItem = (token: string, id: string) =>
+  apiFetch<void>(`/branding/${id}`, {
+    method: "DELETE",
+    token,
+  });
+
 interface FullProjectResponse {
   id: string;
   title: string;
@@ -174,6 +194,26 @@ const createFullProject = (token: string, payload: FullProjectPayload) => {
     token,
   });
 };
+
+const updateFullProject = (token: string, id: string, payload: Partial<FullProjectPayload>) => {
+  const formData = new FormData();
+  if (payload.title) formData.append("title", payload.title);
+  if (payload.description) formData.append("description", payload.description);
+  if (payload.externalLink) formData.append("externalLink", payload.externalLink);
+  if (payload.image) formData.append("image", payload.image);
+
+  return apiFetch<FullProjectResponse>(`/full-projects/${id}`, {
+    method: "PATCH",
+    body: formData,
+    token,
+  });
+};
+
+const deleteFullProject = (token: string, id: string) =>
+  apiFetch<void>(`/full-projects/${id}`, {
+    method: "DELETE",
+    token,
+  });
 
 interface DesignItemResponse {
   id: string;
@@ -211,6 +251,26 @@ const createDesignItem = (token: string, payload: DesignItemPayload) => {
     token,
   });
 };
+
+const updateDesignItem = (token: string, id: string, payload: Partial<DesignItemPayload>) => {
+  const formData = new FormData();
+  if (payload.title) formData.append("title", payload.title);
+  if (payload.description) formData.append("description", payload.description);
+  if (payload.externalLink) formData.append("externalLink", payload.externalLink);
+  if (payload.image) formData.append("image", payload.image);
+
+  return apiFetch<DesignItemResponse>(`/design/${id}`, {
+    method: "PATCH",
+    body: formData,
+    token,
+  });
+};
+
+const deleteDesignItem = (token: string, id: string) =>
+  apiFetch<void>(`/design/${id}`, {
+    method: "DELETE",
+    token,
+  });
 
 interface TestimonialResponse {
   id: string;
@@ -250,6 +310,27 @@ const createTestimonial = (token: string, payload: TestimonialPayload) => {
   });
 };
 
+const updateTestimonial = (token: string, id: string, payload: Partial<TestimonialPayload>) => {
+  const formData = new FormData();
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.role) formData.append("role", payload.role);
+  if (payload.testimonial) formData.append("testimonial", payload.testimonial);
+  if (payload.externalLink) formData.append("externalLink", payload.externalLink);
+  if (payload.photo) formData.append("photo", payload.photo);
+
+  return apiFetch<TestimonialResponse>(`/testimonials/${id}`, {
+    method: "PATCH",
+    body: formData,
+    token,
+  });
+};
+
+const deleteTestimonial = (token: string, id: string) =>
+  apiFetch<void>(`/testimonials/${id}`, {
+    method: "DELETE",
+    token,
+  });
+
 const submitContactForm = (payload: { name: string; email: string; phone?: string; company?: string; message: string }) =>
   apiFetch<{ message: string }>("/contact", {
     method: "POST",
@@ -284,12 +365,20 @@ export {
   deleteVideoProject,
   fetchBrandingItems,
   createBrandingItem,
+  updateBrandingItem,
+  deleteBrandingItem,
   fetchFullProjects,
   createFullProject,
+  updateFullProject,
+  deleteFullProject,
   fetchDesignItems,
   createDesignItem,
+  updateDesignItem,
+  deleteDesignItem,
   fetchTestimonials,
   createTestimonial,
+  updateTestimonial,
+  deleteTestimonial,
   submitContactForm,
   fetchContactSubmissions,
   markContactAsRead,

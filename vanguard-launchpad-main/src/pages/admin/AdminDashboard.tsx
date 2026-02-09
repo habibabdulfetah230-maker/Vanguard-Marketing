@@ -32,18 +32,26 @@ import {
   type VideoProjectPayload,
   fetchBrandingItems,
   createBrandingItem,
+  updateBrandingItem,
+  deleteBrandingItem,
   type BrandingItemResponse,
   type BrandingItemPayload,
   fetchFullProjects,
   createFullProject,
+  updateFullProject,
+  deleteFullProject,
   type FullProjectResponse,
   type FullProjectPayload,
   fetchDesignItems,
   createDesignItem,
+  updateDesignItem,
+  deleteDesignItem,
   type DesignItemResponse,
   type DesignItemPayload,
   fetchTestimonials,
   createTestimonial,
+  updateTestimonial,
+  deleteTestimonial,
   type TestimonialResponse,
   type TestimonialPayload,
   fetchContactSubmissions,
@@ -587,6 +595,67 @@ const AdminDashboard = () => {
     },
   });
 
+  // Update/Delete mutations for all content types
+  const updateBrandingMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<BrandingItemPayload> }) =>
+      updateBrandingItem(token, id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["branding-items"] });
+    },
+  });
+
+  const deleteBrandingMutation = useMutation({
+    mutationFn: (id: string) => deleteBrandingItem(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["branding-items"] });
+    },
+  });
+
+  const updateFullProjectMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<FullProjectPayload> }) =>
+      updateFullProject(token, id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["full-projects"] });
+    },
+  });
+
+  const deleteFullProjectMutation = useMutation({
+    mutationFn: (id: string) => deleteFullProject(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["full-projects"] });
+    },
+  });
+
+  const updateDesignMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<DesignItemPayload> }) =>
+      updateDesignItem(token, id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["design-items"] });
+    },
+  });
+
+  const deleteDesignMutation = useMutation({
+    mutationFn: (id: string) => deleteDesignItem(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["design-items"] });
+    },
+  });
+
+  const updateTestimonialMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<TestimonialPayload> }) =>
+      updateTestimonial(token, id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+    },
+  });
+
+  const deleteTestimonialMutation = useMutation({
+    mutationFn: (id: string) => deleteTestimonial(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+    },
+  });
+
   const handleBrandingImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -853,16 +922,27 @@ const AdminDashboard = () => {
                 <h3 className="text-lg font-semibold text-white">{item.title}</h3>
                 {item.description && <p className="mt-2 text-sm text-slate-300">{item.description}</p>}
               </div>
-              <Button
-                variant="outline"
-                className="w-full justify-between border-white/20 text-slate-100 hover:bg-white/10"
-                asChild
-              >
-                <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
-                  View project
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 justify-between border-white/20 text-slate-100 hover:bg-white/10"
+                  asChild
+                >
+                  <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
+                    View project
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteFullProjectMutation.mutate(item.id)}
+                  disabled={deleteFullProjectMutation.isPending}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
               <p className="text-xs uppercase tracking-wide text-slate-400">
                 Published {new Date(item.createdAt).toLocaleDateString()}
               </p>
@@ -915,16 +995,27 @@ const AdminDashboard = () => {
                 <h3 className="text-lg font-semibold text-white">{item.title}</h3>
                 {item.description && <p className="mt-2 text-sm text-slate-300">{item.description}</p>}
               </div>
-              <Button
-                variant="outline"
-                className="w-full justify-between border-white/20 text-slate-100 hover:bg-white/10"
-                asChild
-              >
-                <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
-                  Visit project
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 justify-between border-white/20 text-slate-100 hover:bg-white/10"
+                  asChild
+                >
+                  <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
+                    Visit project
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteBrandingMutation.mutate(item.id)}
+                  disabled={deleteBrandingMutation.isPending}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
               <p className="text-xs uppercase tracking-wide text-slate-400">
                 Published {new Date(item.createdAt).toLocaleDateString()}
               </p>
@@ -989,9 +1080,20 @@ const AdminDashboard = () => {
                   </a>
                 </Button>
               )}
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                Published {new Date(item.createdAt).toLocaleDateString()}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  Published {new Date(item.createdAt).toLocaleDateString()}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteDesignMutation.mutate(item.id)}
+                  disabled={deleteDesignMutation.isPending}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}
@@ -1037,18 +1139,29 @@ const AdminDashboard = () => {
               </div>
             </div>
             <p className="mt-4 text-sm text-slate-200">"{item.testimonial}"</p>
-            {item.externalLink && (
+            <div className="mt-4 flex items-center justify-between">
+              {item.externalLink && (
+                <Button
+                  variant="outline"
+                  className="justify-between border-white/20 text-slate-100 hover:bg-white/10"
+                  asChild
+                >
+                  <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
+                    View profile
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
               <Button
-                variant="outline"
-                className="mt-4 w-full justify-between border-white/20 text-slate-100 hover:bg-white/10"
-                asChild
+                variant="ghost"
+                size="sm"
+                onClick={() => deleteTestimonialMutation.mutate(item.id)}
+                disabled={deleteTestimonialMutation.isPending}
+                className="text-destructive hover:text-destructive"
               >
-                <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
-                  View profile
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+                <Trash2 className="h-4 w-4" />
               </Button>
-            )}
+            </div>
           </div>
         ))}
       </div>
