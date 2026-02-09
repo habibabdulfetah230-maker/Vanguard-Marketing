@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "cd vanguard-launchpad-main && npm install && npm run build",
+  "outputDirectory": "vanguard-launchpad-main/dist",
+  "installCommand": "cd vanguard-launchpad-main && npm install",
+  "framework": "vite"
+}
