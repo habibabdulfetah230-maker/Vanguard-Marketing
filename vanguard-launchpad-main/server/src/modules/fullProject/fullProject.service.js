@@ -31,4 +31,8 @@ const deleteFullProject = async (id) => {
   await FullProject.findByIdAndDelete(id);
 };
 
-export { createFullProject, listFullProjects, updateFullProject, deleteFullProject };
+const clearAllFullProjects = async () => {
+  await FullProject.deleteMany({});
+};
+
+export { createFullProject, listFullProjects, updateFullProject, deleteFullProject, clearAllFullProjects };

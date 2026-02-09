@@ -8,6 +8,7 @@ import {
   listBrandingItemsController,
   updateBrandingItemController,
   deleteBrandingItemController,
+  clearAllBrandingController,
 } from "./branding.controller.js";
 import { createBrandingSchema } from "./branding.validation.js";
 
@@ -19,5 +20,6 @@ router.get("/", listBrandingItemsController);
 router.post("/", authMiddleware, requireAdmin, upload, validateRequest(createBrandingSchema), createBrandingItemController);
 router.patch("/:id", authMiddleware, requireAdmin, upload, validateRequest(createBrandingSchema), updateBrandingItemController);
 router.delete("/:id", authMiddleware, requireAdmin, deleteBrandingItemController);
+router.delete("/", authMiddleware, requireAdmin, clearAllBrandingController);
 
 export default router;

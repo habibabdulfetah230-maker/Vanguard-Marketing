@@ -33,4 +33,8 @@ const deleteTestimonial = async (id) => {
   await Testimonial.findByIdAndDelete(id);
 };
 
-export { createTestimonial, listTestimonials, updateTestimonial, deleteTestimonial };
+const clearAllTestimonials = async () => {
+  await Testimonial.deleteMany({});
+};
+
+export { createTestimonial, listTestimonials, updateTestimonial, deleteTestimonial, clearAllTestimonials };

@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createTestimonial, listTestimonials, updateTestimonial, deleteTestimonial } from "./testimonial.service.js";
+import { createTestimonial, listTestimonials, updateTestimonial, deleteTestimonial, clearAllTestimonials } from "./testimonial.service.js";
 
 const mapTestimonial = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -68,4 +68,9 @@ const deleteTestimonialController = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-export { createTestimonialController, listTestimonialsController, updateTestimonialController, deleteTestimonialController };
+const clearAllTestimonialsController = asyncHandler(async (_req, res) => {
+  await clearAllTestimonials();
+  res.status(200).json({ message: "All testimonials cleared successfully" });
+});
+
+export { createTestimonialController, listTestimonialsController, updateTestimonialController, deleteTestimonialController, clearAllTestimonialsController };

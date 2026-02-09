@@ -31,4 +31,8 @@ const deleteDesignItem = async (id) => {
   await DesignItem.findByIdAndDelete(id);
 };
 
-export { createDesignItem, listDesignItems, updateDesignItem, deleteDesignItem };
+const clearAllDesignItems = async () => {
+  await DesignItem.deleteMany({});
+};
+
+export { createDesignItem, listDesignItems, updateDesignItem, deleteDesignItem, clearAllDesignItems };

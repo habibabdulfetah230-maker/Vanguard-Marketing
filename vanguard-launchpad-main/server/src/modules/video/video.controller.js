@@ -3,6 +3,7 @@ import {
   createVideoProject,
   updateVideoProject,
   deleteVideoProject,
+  clearAllVideoProjects,
   listVideoProjects,
   getVideoProjectById,
 } from "./video.service.js";
@@ -29,6 +30,11 @@ const deleteVideoProjectController = asyncHandler(async (req, res) => {
   } = req.validated;
   await deleteVideoProject(id);
   res.status(204).send();
+});
+
+const clearAllVideoProjectsController = asyncHandler(async (_req, res) => {
+  await clearAllVideoProjects();
+  res.status(200).json({ message: "All video projects cleared successfully" });
 });
 
 const getVideoProjectController = asyncHandler(async (req, res) => {
@@ -60,6 +66,7 @@ export {
   createVideoProjectController,
   updateVideoProjectController,
   deleteVideoProjectController,
+  clearAllVideoProjectsController,
   getVideoProjectController,
   listPublicVideoProjectsController,
   listAdminVideoProjectsController,

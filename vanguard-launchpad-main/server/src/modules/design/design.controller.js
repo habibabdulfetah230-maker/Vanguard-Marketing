@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createDesignItem, listDesignItems, updateDesignItem, deleteDesignItem } from "./design.service.js";
+import { createDesignItem, listDesignItems, updateDesignItem, deleteDesignItem, clearAllDesignItems } from "./design.service.js";
 
 const mapDesignItem = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -67,4 +67,9 @@ const deleteDesignController = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-export { createDesignController, listDesignController, updateDesignController, deleteDesignController };
+const clearAllDesignController = asyncHandler(async (_req, res) => {
+  await clearAllDesignItems();
+  res.status(200).json({ message: "All design items cleared successfully" });
+});
+
+export { createDesignController, listDesignController, updateDesignController, deleteDesignController, clearAllDesignController };

@@ -51,6 +51,10 @@ const deleteVideoProject = async (id) => {
   return deleted;
 };
 
+const clearAllVideoProjects = async () => {
+  await VideoProject.deleteMany({});
+};
+
 const listVideoProjects = async ({ includeUnpublished = false } = {}) => {
   const filter = includeUnpublished ? {} : { isPublished: true };
   const projects = await VideoProject.find(filter).sort({ createdAt: -1 });
@@ -69,6 +73,7 @@ export {
   createVideoProject,
   updateVideoProject,
   deleteVideoProject,
+  clearAllVideoProjects,
   listVideoProjects,
   getVideoProjectById,
 };

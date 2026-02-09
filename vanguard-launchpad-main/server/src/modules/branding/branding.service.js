@@ -31,4 +31,8 @@ const deleteBrandingItem = async (id) => {
   await BrandingItem.findByIdAndDelete(id);
 };
 
-export { createBrandingItem, listBrandingItems, updateBrandingItem, deleteBrandingItem };
+const clearAllBrandingItems = async () => {
+  await BrandingItem.deleteMany({});
+};
+
+export { createBrandingItem, listBrandingItems, updateBrandingItem, deleteBrandingItem, clearAllBrandingItems };

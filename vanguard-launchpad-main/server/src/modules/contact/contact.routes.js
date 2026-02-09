@@ -7,6 +7,7 @@ import {
   listContactSubmissionsController,
   markAsReadController,
   deleteContactSubmissionController,
+  clearAllContactSubmissionsController,
 } from "./contact.controller.js";
 import { submitContactSchema } from "./contact.validation.js";
 
@@ -19,5 +20,6 @@ router.post("/", validateRequest(submitContactSchema), submitContactController);
 router.get("/", authMiddleware, requireAdmin, listContactSubmissionsController);
 router.patch("/:id/read", authMiddleware, requireAdmin, markAsReadController);
 router.delete("/:id", authMiddleware, requireAdmin, deleteContactSubmissionController);
+router.delete("/clear", authMiddleware, requireAdmin, clearAllContactSubmissionsController);
 
 export default router;

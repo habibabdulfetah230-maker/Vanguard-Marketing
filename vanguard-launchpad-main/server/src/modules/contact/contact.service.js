@@ -29,4 +29,8 @@ const deleteContactSubmission = async (id) => {
   await ContactSubmission.findByIdAndDelete(id);
 };
 
-export { createContactSubmission, listContactSubmissions, markAsRead, deleteContactSubmission };
+const clearAllContactSubmissions = async () => {
+  await ContactSubmission.deleteMany({});
+};
+
+export { createContactSubmission, listContactSubmissions, markAsRead, deleteContactSubmission, clearAllContactSubmissions };

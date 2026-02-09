@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createBrandingItem, listBrandingItems, updateBrandingItem, deleteBrandingItem } from "./branding.service.js";
+import { createBrandingItem, listBrandingItems, updateBrandingItem, deleteBrandingItem, clearAllBrandingItems } from "./branding.service.js";
 
 const mapBrandingItem = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -67,4 +67,9 @@ const deleteBrandingItemController = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-export { createBrandingItemController, listBrandingItemsController, updateBrandingItemController, deleteBrandingItemController };
+const clearAllBrandingController = asyncHandler(async (_req, res) => {
+  await clearAllBrandingItems();
+  res.status(200).json({ message: "All branding items cleared successfully" });
+});
+
+export { createBrandingItemController, listBrandingItemsController, updateBrandingItemController, deleteBrandingItemController, clearAllBrandingController };

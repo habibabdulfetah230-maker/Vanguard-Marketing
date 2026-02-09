@@ -28,35 +28,41 @@ import {
   createVideoProject,
   updateVideoProject,
   deleteVideoProject,
+  clearAllVideoProjects,
   type VideoProjectResponse,
   type VideoProjectPayload,
   fetchBrandingItems,
   createBrandingItem,
   updateBrandingItem,
   deleteBrandingItem,
+  clearAllBrandingItems,
   type BrandingItemResponse,
   type BrandingItemPayload,
   fetchFullProjects,
   createFullProject,
   updateFullProject,
   deleteFullProject,
+  clearAllFullProjects,
   type FullProjectResponse,
   type FullProjectPayload,
   fetchDesignItems,
   createDesignItem,
   updateDesignItem,
   deleteDesignItem,
+  clearAllDesignItems,
   type DesignItemResponse,
   type DesignItemPayload,
   fetchTestimonials,
   createTestimonial,
   updateTestimonial,
   deleteTestimonial,
+  clearAllTestimonials,
   type TestimonialResponse,
   type TestimonialPayload,
   fetchContactSubmissions,
   markContactAsRead,
   deleteContactSubmission,
+  clearAllContactSubmissions,
 } from "@/lib/api";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -655,6 +661,40 @@ const AdminDashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["testimonials"] });
     },
   });
+
+  // Clear all mutations
+  const clearAllDataMutation = useMutation({
+    mutationFn: async () => {
+      if (!token) throw new Error("Not authenticated");
+      await Promise.all([
+        clearAllVideoProjects(token),
+        clearAllBrandingItems(token),
+        clearAllFullProjects(token),
+        clearAllDesignItems(token),
+        clearAllTestimonials(token),
+        clearAllContactSubmissions(token),
+      ]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["video-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["branding-items"] });
+      queryClient.invalidateQueries({ queryKey: ["full-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["design-items"] });
+      queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["contact-submissions"] });
+      toast({ title: "All data cleared successfully" });
+    },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : "Failed to clear data";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    },
+  });
+
+  const handleClearAllData = async () => {
+    if (confirm("WARNING: This will delete ALL data including videos, branding, projects, design, testimonials, and messages. This action cannot be undone. Are you sure?")) {
+      await clearAllDataMutation.mutateAsync();
+    }
+  };
 
   const handleBrandingImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1276,6 +1316,27 @@ const AdminDashboard = () => {
           </nav>
           <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-primary/20 to-primary/5 p-4 text-xs text-slate-200">
             Toggle a category to focus your workflow. Items refresh automatically after every upload.
+          </div>
+          <div className="mt-auto pt-4 border-t border-white/10">
+            <Button
+              variant="destructive"
+              className="w-full text-xs"
+              onClick={handleClearAllData}
+              disabled={clearAllDataMutation.isPending}
+            >
+              {clearAllDataMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Clearing...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-3 w-3" /> Clear All Data
+                </>
+              )}
+            </Button>
+            <p className="text-[10px] text-slate-400 mt-2 text-center">
+              This deletes ALL content permanently
+            </p>
           </div>
         </aside>
 

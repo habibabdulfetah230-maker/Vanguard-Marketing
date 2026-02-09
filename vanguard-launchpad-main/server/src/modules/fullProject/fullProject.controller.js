@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createFullProject, listFullProjects, updateFullProject, deleteFullProject } from "./fullProject.service.js";
+import { createFullProject, listFullProjects, updateFullProject, deleteFullProject, clearAllFullProjects } from "./fullProject.service.js";
 
 const mapFullProject = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -67,4 +67,9 @@ const deleteFullProjectController = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-export { createFullProjectController, listFullProjectsController, updateFullProjectController, deleteFullProjectController };
+const clearAllFullProjectsController = asyncHandler(async (_req, res) => {
+  await clearAllFullProjects();
+  res.status(200).json({ message: "All full projects cleared successfully" });
+});
+
+export { createFullProjectController, listFullProjectsController, updateFullProjectController, deleteFullProjectController, clearAllFullProjectsController };

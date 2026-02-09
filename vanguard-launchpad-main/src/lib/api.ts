@@ -355,6 +355,43 @@ const deleteContactSubmission = (token: string, id: string) =>
     token,
   });
 
+// Clear all functions
+const clearAllBrandingItems = (token: string) =>
+  apiFetch<{ message: string }>("/branding", {
+    method: "DELETE",
+    token,
+  });
+
+const clearAllDesignItems = (token: string) =>
+  apiFetch<{ message: string }>("/design", {
+    method: "DELETE",
+    token,
+  });
+
+const clearAllFullProjects = (token: string) =>
+  apiFetch<{ message: string }>("/full-projects", {
+    method: "DELETE",
+    token,
+  });
+
+const clearAllTestimonials = (token: string) =>
+  apiFetch<{ message: string }>("/testimonials", {
+    method: "DELETE",
+    token,
+  });
+
+const clearAllVideoProjects = (token: string) =>
+  apiFetch<{ message: string }>("/admin/videos/clear", {
+    method: "DELETE",
+    token,
+  });
+
+const clearAllContactSubmissions = (token: string) =>
+  apiFetch<{ message: string }>("/contact/clear", {
+    method: "DELETE",
+    token,
+  });
+
 export {
   API_BASE_URL,
   loginAdmin,
@@ -363,26 +400,32 @@ export {
   createVideoProject,
   updateVideoProject,
   deleteVideoProject,
+  clearAllVideoProjects,
   fetchBrandingItems,
   createBrandingItem,
   updateBrandingItem,
   deleteBrandingItem,
+  clearAllBrandingItems,
   fetchFullProjects,
   createFullProject,
   updateFullProject,
   deleteFullProject,
+  clearAllFullProjects,
   fetchDesignItems,
   createDesignItem,
   updateDesignItem,
   deleteDesignItem,
+  clearAllDesignItems,
   fetchTestimonials,
   createTestimonial,
   updateTestimonial,
   deleteTestimonial,
+  clearAllTestimonials,
   submitContactForm,
   fetchContactSubmissions,
   markContactAsRead,
   deleteContactSubmission,
+  clearAllContactSubmissions,
 };
 export type {
   VideoProjectResponse,

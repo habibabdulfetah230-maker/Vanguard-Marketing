@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createContactSubmission, listContactSubmissions, markAsRead, deleteContactSubmission } from "./contact.service.js";
+import { createContactSubmission, listContactSubmissions, markAsRead, deleteContactSubmission, clearAllContactSubmissions } from "./contact.service.js";
 
 const mapContactSubmission = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -55,4 +55,9 @@ const deleteContactSubmissionController = asyncHandler(async (req, res) => {
   res.status(204).send();
 });
 
-export { submitContactController, listContactSubmissionsController, markAsReadController, deleteContactSubmissionController };
+const clearAllContactSubmissionsController = asyncHandler(async (_req, res) => {
+  await clearAllContactSubmissions();
+  res.status(200).json({ message: "All contact submissions cleared successfully" });
+});
+
+export { submitContactController, listContactSubmissionsController, markAsReadController, deleteContactSubmissionController, clearAllContactSubmissionsController };

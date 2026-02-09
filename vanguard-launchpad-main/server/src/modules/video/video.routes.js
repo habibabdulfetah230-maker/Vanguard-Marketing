@@ -12,6 +12,7 @@ import {
   createVideoProjectController,
   updateVideoProjectController,
   deleteVideoProjectController,
+  clearAllVideoProjectsController,
   getVideoProjectController,
   listPublicVideoProjectsController,
   listAdminVideoProjectsController,
@@ -32,6 +33,8 @@ adminVideoRouter
   .get(validateRequest(getVideoSchema), getVideoProjectController)
   .patch(validateRequest(updateVideoSchema), updateVideoProjectController)
   .delete(validateRequest(deleteVideoSchema), deleteVideoProjectController);
+
+adminVideoRouter.delete("/clear", clearAllVideoProjectsController);
 
 publicVideoRouter.get("/", listPublicVideoProjectsController);
 
