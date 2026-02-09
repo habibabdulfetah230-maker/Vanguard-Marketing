@@ -16,4 +16,19 @@ const listBrandingItems = async () => {
   return items;
 };
 
-export { createBrandingItem, listBrandingItems };
+const updateBrandingItem = async (id, { title, description, externalLink, imageUrl }) => {
+  const update = {};
+  if (title !== undefined) update.title = title;
+  if (description !== undefined) update.description = description;
+  if (externalLink !== undefined) update.externalLink = externalLink;
+  if (imageUrl !== undefined) update.imageUrl = imageUrl;
+
+  const brandingItem = await BrandingItem.findByIdAndUpdate(id, update, { new: true });
+  return brandingItem;
+};
+
+const deleteBrandingItem = async (id) => {
+  await BrandingItem.findByIdAndDelete(id);
+};
+
+export { createBrandingItem, listBrandingItems, updateBrandingItem, deleteBrandingItem };

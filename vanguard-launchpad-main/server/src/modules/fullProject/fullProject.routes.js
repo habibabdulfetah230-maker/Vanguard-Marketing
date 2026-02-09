@@ -6,6 +6,8 @@ import storage from "../../config/storage.js";
 import {
   createFullProjectController,
   listFullProjectsController,
+  updateFullProjectController,
+  deleteFullProjectController,
 } from "./fullProject.controller.js";
 import { createFullProjectSchema } from "./fullProject.validation.js";
 
@@ -15,5 +17,7 @@ const router = Router();
 
 router.get("/", listFullProjectsController);
 router.post("/", authMiddleware, requireAdmin, upload, validateRequest(createFullProjectSchema), createFullProjectController);
+router.patch("/:id", authMiddleware, requireAdmin, upload, validateRequest(createFullProjectSchema), updateFullProjectController);
+router.delete("/:id", authMiddleware, requireAdmin, deleteFullProjectController);
 
 export default router;

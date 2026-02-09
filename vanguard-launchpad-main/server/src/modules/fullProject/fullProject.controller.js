@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createFullProject, listFullProjects } from "./fullProject.service.js";
+import { createFullProject, listFullProjects, updateFullProject, deleteFullProject } from "./fullProject.service.js";
 
 const mapFullProject = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -43,4 +43,28 @@ const listFullProjectsController = asyncHandler(async (_req, res) => {
   res.status(200).json(items.map(mapFullProject));
 });
 
-export { createFullProjectController, listFullProjectsController };
+const updateFullProjectController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.validated ?? {};
+  const { file } = req;
+
+  const updateData = { ...body };
+  if (file) {
+    updateData.imageUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
+  }
+
+  const project = await updateFullProject(id, updateData);
+  if (!project) {
+    throw createError(404, "Full project not found");
+  }
+
+  res.status(200).json(mapFullProject(project));
+});
+
+const deleteFullProjectController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await deleteFullProject(id);
+  res.status(204).send();
+});
+
+export { createFullProjectController, listFullProjectsController, updateFullProjectController, deleteFullProjectController };

@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createDesignItem, listDesignItems } from "./design.service.js";
+import { createDesignItem, listDesignItems, updateDesignItem, deleteDesignItem } from "./design.service.js";
 
 const mapDesignItem = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -43,4 +43,28 @@ const listDesignController = asyncHandler(async (_req, res) => {
   res.status(200).json(items.map(mapDesignItem));
 });
 
-export { createDesignController, listDesignController };
+const updateDesignController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.validated ?? {};
+  const { file } = req;
+
+  const updateData = { ...body };
+  if (file) {
+    updateData.imageUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
+  }
+
+  const item = await updateDesignItem(id, updateData);
+  if (!item) {
+    throw createError(404, "Design item not found");
+  }
+
+  res.status(200).json(mapDesignItem(item));
+});
+
+const deleteDesignController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await deleteDesignItem(id);
+  res.status(204).send();
+});
+
+export { createDesignController, listDesignController, updateDesignController, deleteDesignController };

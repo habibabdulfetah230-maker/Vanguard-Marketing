@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createBrandingItem, listBrandingItems } from "./branding.service.js";
+import { createBrandingItem, listBrandingItems, updateBrandingItem, deleteBrandingItem } from "./branding.service.js";
 
 const mapBrandingItem = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -43,4 +43,28 @@ const listBrandingItemsController = asyncHandler(async (_req, res) => {
   res.status(200).json(items.map(mapBrandingItem));
 });
 
-export { createBrandingItemController, listBrandingItemsController };
+const updateBrandingItemController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.validated ?? {};
+  const { file } = req;
+
+  const updateData = { ...body };
+  if (file) {
+    updateData.imageUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
+  }
+
+  const brandingItem = await updateBrandingItem(id, updateData);
+  if (!brandingItem) {
+    throw createError(404, "Branding item not found");
+  }
+
+  res.status(200).json(mapBrandingItem(brandingItem));
+});
+
+const deleteBrandingItemController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await deleteBrandingItem(id);
+  res.status(204).send();
+});
+
+export { createBrandingItemController, listBrandingItemsController, updateBrandingItemController, deleteBrandingItemController };

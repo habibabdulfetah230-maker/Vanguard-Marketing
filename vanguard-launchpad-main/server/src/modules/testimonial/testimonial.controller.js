@@ -1,6 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { createError } from "../../utils/errorResponse.js";
-import { createTestimonial, listTestimonials } from "./testimonial.service.js";
+import { createTestimonial, listTestimonials, updateTestimonial, deleteTestimonial } from "./testimonial.service.js";
 
 const mapTestimonial = (item) => {
   const plain = typeof item?.toObject === "function" ? item.toObject({ versionKey: false }) : item;
@@ -44,4 +44,28 @@ const listTestimonialsController = asyncHandler(async (_req, res) => {
   res.status(200).json(items.map(mapTestimonial));
 });
 
-export { createTestimonialController, listTestimonialsController };
+const updateTestimonialController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.validated ?? {};
+  const { file } = req;
+
+  const updateData = { ...body };
+  if (file) {
+    updateData.photoUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
+  }
+
+  const testimonial = await updateTestimonial(id, updateData);
+  if (!testimonial) {
+    throw createError(404, "Testimonial not found");
+  }
+
+  res.status(200).json(mapTestimonial(testimonial));
+});
+
+const deleteTestimonialController = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await deleteTestimonial(id);
+  res.status(204).send();
+});
+
+export { createTestimonialController, listTestimonialsController, updateTestimonialController, deleteTestimonialController };

@@ -6,6 +6,8 @@ import storage from "../../config/storage.js";
 import {
   createBrandingItemController,
   listBrandingItemsController,
+  updateBrandingItemController,
+  deleteBrandingItemController,
 } from "./branding.controller.js";
 import { createBrandingSchema } from "./branding.validation.js";
 
@@ -15,5 +17,7 @@ const router = Router();
 
 router.get("/", listBrandingItemsController);
 router.post("/", authMiddleware, requireAdmin, upload, validateRequest(createBrandingSchema), createBrandingItemController);
+router.patch("/:id", authMiddleware, requireAdmin, upload, validateRequest(createBrandingSchema), updateBrandingItemController);
+router.delete("/:id", authMiddleware, requireAdmin, deleteBrandingItemController);
 
 export default router;

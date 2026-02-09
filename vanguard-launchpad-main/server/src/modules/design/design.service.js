@@ -16,4 +16,19 @@ const listDesignItems = async () => {
   return items;
 };
 
-export { createDesignItem, listDesignItems };
+const updateDesignItem = async (id, { title, description, externalLink, imageUrl }) => {
+  const update = {};
+  if (title !== undefined) update.title = title;
+  if (description !== undefined) update.description = description;
+  if (externalLink !== undefined) update.externalLink = externalLink;
+  if (imageUrl !== undefined) update.imageUrl = imageUrl;
+
+  const item = await DesignItem.findByIdAndUpdate(id, update, { new: true });
+  return item;
+};
+
+const deleteDesignItem = async (id) => {
+  await DesignItem.findByIdAndDelete(id);
+};
+
+export { createDesignItem, listDesignItems, updateDesignItem, deleteDesignItem };

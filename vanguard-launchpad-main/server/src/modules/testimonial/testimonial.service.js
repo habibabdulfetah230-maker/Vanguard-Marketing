@@ -17,4 +17,20 @@ const listTestimonials = async () => {
   return items;
 };
 
-export { createTestimonial, listTestimonials };
+const updateTestimonial = async (id, { name, role, testimonial, externalLink, photoUrl }) => {
+  const update = {};
+  if (name !== undefined) update.name = name;
+  if (role !== undefined) update.role = role;
+  if (testimonial !== undefined) update.testimonial = testimonial;
+  if (externalLink !== undefined) update.externalLink = externalLink;
+  if (photoUrl !== undefined) update.photoUrl = photoUrl;
+
+  const item = await Testimonial.findByIdAndUpdate(id, update, { new: true });
+  return item;
+};
+
+const deleteTestimonial = async (id) => {
+  await Testimonial.findByIdAndDelete(id);
+};
+
+export { createTestimonial, listTestimonials, updateTestimonial, deleteTestimonial };
