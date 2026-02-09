@@ -250,6 +250,30 @@ const createTestimonial = (token: string, payload: TestimonialPayload) => {
   });
 };
 
+const submitContactForm = (payload: { name: string; email: string; phone?: string; company?: string; message: string }) =>
+  apiFetch<{ message: string }>("/contact", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+const fetchContactSubmissions = (token: string) =>
+  apiFetch<Array<{ id: string; name: string; email: string; phone?: string; company?: string; message: string; isRead: boolean; createdAt: string }>>("/contact", {
+    method: "GET",
+    token,
+  });
+
+const markContactAsRead = (token: string, id: string) =>
+  apiFetch<{ id: string; isRead: boolean }>(`/contact/${id}/read`, {
+    method: "PATCH",
+    token,
+  });
+
+const deleteContactSubmission = (token: string, id: string) =>
+  apiFetch<void>(`/contact/${id}`, {
+    method: "DELETE",
+    token,
+  });
+
 export {
   API_BASE_URL,
   loginAdmin,
@@ -266,6 +290,10 @@ export {
   createDesignItem,
   fetchTestimonials,
   createTestimonial,
+  submitContactForm,
+  fetchContactSubmissions,
+  markContactAsRead,
+  deleteContactSubmission,
 };
 export type {
   VideoProjectResponse,
