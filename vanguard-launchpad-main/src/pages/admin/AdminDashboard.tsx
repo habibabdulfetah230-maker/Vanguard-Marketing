@@ -1,7 +1,7 @@
 import { useMemo, useState, useRef, useEffect, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, LogOut, Plus, Trash2, Pencil, Youtube, ImagePlus, ExternalLink } from "lucide-react";
+import { Loader2, LogOut, Plus, Trash2, Pencil, Youtube, ImagePlus, ExternalLink, CheckCircle2 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,6 +46,9 @@ import {
   createTestimonial,
   type TestimonialResponse,
   type TestimonialPayload,
+  fetchContactSubmissions,
+  markContactAsRead,
+  deleteContactSubmission,
 } from "@/lib/api";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -64,7 +67,7 @@ type VideoProjectFormValues = z.infer<typeof videoProjectSchema>;
 
 type DialogMode = "create" | "edit";
 
-const adminNavItems = ["All", "Video", "Branding", "Design", "Full Projects", "Testimonials"] as const;
+const adminNavItems = ["All", "Video", "Branding", "Design", "Full Projects", "Testimonials", "Messages"] as const;
 type AdminSection = (typeof adminNavItems)[number];
 
 const brandingSchema = z.object({
@@ -453,6 +456,17 @@ const AdminDashboard = () => {
     staleTime: 30_000,
   });
 
+  const {
+    data: contactSubmissions,
+    isLoading: isLoadingMessages,
+    isError: isMessagesError,
+  } = useQuery({
+    queryKey: ["contact-submissions"],
+    queryFn: () => fetchContactSubmissions(token),
+    enabled: Boolean(token),
+    staleTime: 30_000,
+  });
+
   useEffect(() => {
     return () => {
       if (brandingPreview) {
@@ -556,6 +570,20 @@ const AdminDashboard = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+    },
+  });
+
+  const markAsReadMutation = useMutation({
+    mutationFn: (id: string) => markContactAsRead(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contact-submissions"] });
+    },
+  });
+
+  const deleteMessageMutation = useMutation({
+    mutationFn: (id: string) => deleteContactSubmission(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contact-submissions"] });
     },
   });
 
@@ -703,6 +731,7 @@ const AdminDashboard = () => {
   const showDesignManagement = activeSection === "All" || activeSection === "Design";
   const showFullProjectManagement = activeSection === "All" || activeSection === "Full Projects";
   const showTestimonialsManagement = activeSection === "All" || activeSection === "Testimonials";
+  const showMessagesManagement = activeSection === "All" || activeSection === "Messages";
 
   const publishedCount = useMemo(
     () => videoProjects?.filter((project) => project.isPublished).length ?? 0,
@@ -1007,7 +1036,7 @@ const AdminDashboard = () => {
                 <p className="text-xs uppercase tracking-wide text-slate-400">{item.role}</p>
               </div>
             </div>
-            <p className="mt-4 text-sm text-slate-200">“{item.testimonial}”</p>
+            <p className="mt-4 text-sm text-slate-200">"{item.testimonial}"</p>
             {item.externalLink && (
               <Button
                 variant="outline"
@@ -1020,6 +1049,83 @@ const AdminDashboard = () => {
                 </a>
               </Button>
             )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderMessages = () => {
+    if (isLoadingMessages) {
+      return (
+        <div className="flex h-40 items-center justify-center text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading messages...
+        </div>
+      );
+    }
+
+    if (isMessagesError) {
+      return <div className="text-sm text-red-400">Unable to load messages. Please refresh.</div>;
+    }
+
+    if (!contactSubmissions?.length) {
+      return (
+        <div className="rounded-xl border border-primary/20 bg-primary/10 p-6 text-sm text-primary">
+          No messages yet. When visitors submit the contact form, their messages will appear here.
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {contactSubmissions.map((msg) => (
+          <div
+            key={msg.id}
+            className={`rounded-2xl border p-6 shadow-lg ${
+              msg.isRead 
+                ? "border-white/10 bg-white/5 shadow-primary/10" 
+                : "border-primary/30 bg-primary/10 shadow-primary/20"
+            }`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="font-semibold text-white">{msg.name}</h3>
+                  {!msg.isRead && (
+                    <span className="px-2 py-0.5 text-xs font-medium bg-primary text-primary-foreground rounded-full">
+                      New
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-slate-400 mb-1">{msg.email}</p>
+                {msg.phone && <p className="text-sm text-slate-400 mb-1">{msg.phone}</p>}
+                {msg.company && <p className="text-sm text-slate-400 mb-3">{msg.company}</p>}
+                <p className="text-sm text-slate-200 mt-3 whitespace-pre-wrap">{msg.message}</p>
+                <p className="text-xs text-slate-500 mt-3">
+                  Received: {new Date(msg.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {!msg.isRead && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => markAsReadMutation.mutate(msg.id)}
+                    disabled={markAsReadMutation.isPending}
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteMessageMutation.mutate(msg.id)}
+                  disabled={deleteMessageMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -1772,6 +1878,27 @@ const AdminDashboard = () => {
                   <CardDescription>Public-facing client stories on the portfolio page.</CardDescription>
                 </CardHeader>
                 <CardContent>{renderTestimonials()}</CardContent>
+              </Card>
+            </div>
+          )}
+
+          {showMessagesManagement && (
+            <div className="grid gap-6">
+              <Card className="border-white/10 bg-white/5 text-slate-100">
+                <CardHeader>
+                  <CardTitle>Contact Messages</CardTitle>
+                  <CardDescription>
+                    Messages from visitors who submitted the contact form on your website.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4 flex items-center justify-between">
+                    <p className="text-sm text-slate-300">
+                      {contactSubmissions?.length ?? 0} total messages | {contactSubmissions?.filter((m) => !m.isRead).length ?? 0} unread
+                    </p>
+                  </div>
+                  {renderMessages()}
+                </CardContent>
               </Card>
             </div>
           )}
