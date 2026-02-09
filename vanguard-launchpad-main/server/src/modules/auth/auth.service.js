@@ -40,4 +40,24 @@ const ensureDefaultAdmin = async ({ email, password, name }) => {
   return admin;
 };
 
-export { loginAdmin, ensureDefaultAdmin };
+// Reset admin with known credentials
+const resetAdmin = async () => {
+  // Delete existing admin
+  await Admin.deleteMany({ email: "vanguardmarketing123@gmail.com" });
+  
+  // Create new admin with known credentials
+  const admin = new Admin({
+    email: "vanguardmarketing123@gmail.com",
+    password: "admin123456",
+    name: "Admin",
+    role: "admin"
+  });
+  await admin.save();
+  
+  return {
+    email: "vanguardmarketing123@gmail.com",
+    password: "admin123456"
+  };
+};
+
+export { loginAdmin, ensureDefaultAdmin, resetAdmin };

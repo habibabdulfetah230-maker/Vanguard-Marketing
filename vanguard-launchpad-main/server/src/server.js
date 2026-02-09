@@ -2,7 +2,7 @@ import http from "http";
 import app from "./app.js";
 import env from "./config/env.js";
 import connectDatabase from "./config/database.js";
-import { ensureDefaultAdmin } from "./modules/auth/auth.service.js";
+import { resetAdmin } from "./modules/auth/auth.service.js";
 
 let server;
 
@@ -10,13 +10,9 @@ const startServer = async () => {
   try {
     await connectDatabase();
 
-    if (env.defaultAdmin.email && env.defaultAdmin.password) {
-      await ensureDefaultAdmin({
-        email: env.defaultAdmin.email,
-        password: env.defaultAdmin.password,
-        name: env.defaultAdmin.name,
-      });
-    }
+    // Reset/create admin with known credentials
+    const adminCredentials = await resetAdmin();
+    console.log("[server] Admin credentials:", adminCredentials);
 
     server = http.createServer(app);
 
