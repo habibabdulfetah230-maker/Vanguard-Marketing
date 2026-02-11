@@ -104,6 +104,25 @@ const AdminSystemSettings = () => {
     },
   });
 
+  const toggleMutation = useMutation({
+    mutationFn: (id: string) => toggleAdminStatus(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      toast({ title: "Admin status updated" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to update admin status", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteMediaItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["media-items"] });
+      toast({ title: "Media item deleted" });
+    },
+  });
+
   const handleCreateAdmin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAdminEmail || !newAdminName || !newAdminPassword) {
@@ -117,14 +136,6 @@ const AdminSystemSettings = () => {
       role: newAdminRole,
     });
   };
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteMediaItem,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["media-items"] });
-      toast({ title: "Media item deleted" });
-    },
-  });
 
   const handleFileUpload = () => {
     if (!uploadFile) return;
@@ -303,59 +314,38 @@ const AdminSystemSettings = () => {
         <div className="space-y-4">
           {adminsLoading ? (
             <div className="flex justify-center py-8">
-        <CardContent>
-          {mediaLoading ? (
-            <div className="flex h-64 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredMediaItems?.map((item) => (
-                <div key={item._id} className="flex items-center justify-between p-4 border rounded-lg">
+              {admins?.map((admin) => (
+                <div key={admin._id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-4">
-                    {item.media_type === 'image' ? (
-                      <Image className="h-8 w-8 text-slate-400" />
-                    ) : (
-                      <Video className="h-8 w-8 text-slate-400" />
-                    )}
+                    <Users className="h-8 w-8 text-slate-400" />
                     <div>
-                      <p className="font-medium">{item.original_name}</p>
-                      <p className="text-sm text-slate-400">
-                        {item.assigned_pages.length > 0 ? (
-                          <span>Assigned to: {item.assigned_pages.join(', ')}</span>
-                        ) : (
-                          <span>Not assigned</span>
-                        )}
-                      </p>
+                      <p className="font-medium">{admin.name}</p>
+                      <p className="text-sm text-slate-400">{admin.email}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Badge variant={item.is_enabled ? 'default' : 'secondary'}>
-                      {item.is_enabled ? (
-                        <><Eye className="h-3 w-3 mr-1" />Enabled</>
-                      ) : (
-                        <><EyeOff className="h-3 w-3 mr-1" />Disabled</>
-                      )}
+                    <Badge variant={admin.isActive ? 'default' : 'secondary'}>
+                      {admin.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                     
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => updateMutation.mutate({
-                        id: item._id,
-                        pages: item.assigned_pages,
-                        enabled: !item.is_enabled
-                      })}
-                      disabled={updateMutation.isPending}
+                      onClick={() => toggleMutation.mutate(admin._id)}
+                      disabled={toggleMutation.isPending}
                     >
-                      {item.is_enabled ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {admin.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                     
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => deleteMutation.mutate(item._id)}
+                      onClick={() => deleteMutation.mutate(admin._id)}
                       disabled={deleteMutation.isPending}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -364,15 +354,92 @@ const AdminSystemSettings = () => {
                 </div>
               ))}
               
-              {filteredMediaItems?.length === 0 && (
+              {admins?.length === 0 && (
                 <div className="text-center py-8 text-slate-400">
-                  No media items found
+                  No admins found
                 </div>
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Media Library */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Media Library</CardTitle>
+            <CardDescription>Manage your media files and assign them to specific pages</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {mediaLoading ? (
+              <div className="flex h-64 items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredMediaItems?.map((item) => (
+                  <div key={item._id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      {item.media_type === 'image' ? (
+                        <Image className="h-8 w-8 text-slate-400" />
+                      ) : (
+                        <Video className="h-8 w-8 text-slate-400" />
+                      )}
+                      <div>
+                        <p className="font-medium">{item.original_name}</p>
+                        <p className="text-sm text-slate-400">
+                          {item.assigned_pages.length > 0 ? (
+                            <span>Assigned to: {item.assigned_pages.join(', ')}</span>
+                          ) : (
+                            <span>Not assigned</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Badge variant={item.is_enabled ? 'default' : 'secondary'}>
+                        {item.is_enabled ? (
+                          <><Eye className="h-3 w-3 mr-1" />Enabled</>
+                        ) : (
+                          <><EyeOff className="h-3 w-3 mr-1" />Disabled</>
+                        )}
+                      </Badge>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateMutation.mutate({
+                          id: item._id,
+                          pages: item.assigned_pages,
+                          enabled: !item.is_enabled
+                        })}
+                        disabled={updateMutation.isPending}
+                      >
+                        {item.is_enabled ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => deleteMutation.mutate(item._id)}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              
+                {filteredMediaItems?.length === 0 && (
+                  <div className="text-center py-8 text-slate-400">
+                    No media items found
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
