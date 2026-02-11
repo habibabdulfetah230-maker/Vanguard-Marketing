@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
@@ -66,6 +66,13 @@ export const Header = () => {
 
         {/* CTA Button */}
         <div className="hidden lg:flex items-center gap-4">
+          {/* Hidden Admin Button - Only Visible to Owner */}
+          {window.location.hostname === 'localhost' && (
+            <Link to="/admin?token=vanguard-admin-secret-2024" className="text-xs font-medium text-muted-foreground hover:text-foreground opacity-50 hover:opacity-100 transition-opacity">
+              <Settings className="w-3 h-3 mr-1" />
+              Admin
+            </Link>
+          )}
           <Link to="/contact">
             <Button variant="hero" size="default">
               <Phone className="w-4 h-4" />
@@ -106,6 +113,13 @@ export const Header = () => {
                   {link.name}
                 </Link>
               ))}
+              {/* Hidden Admin Button - Only Visible to Owner */}
+              {window.location.hostname === 'localhost' && (
+                <Link to="/admin?token=vanguard-admin-secret-2024" className="mt-4 text-sm font-medium text-muted-foreground hover:text-foreground opacity-50 hover:opacity-100 transition-opacity">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Admin Dashboard
+                </Link>
+              )}
               <Link to="/contact" className="mt-4">
                 <Button variant="hero" size="lg" className="w-full">
                   <Phone className="w-4 h-4" />
