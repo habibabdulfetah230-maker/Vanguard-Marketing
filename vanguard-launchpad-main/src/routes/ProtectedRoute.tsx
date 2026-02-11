@@ -14,7 +14,12 @@ const ProtectedRoute = () => {
     return <Outlet />;
   }
 
-  return <Navigate to="/" replace state={{ from: location }} />;
+  // For admin routes without proper token, redirect to home
+  if (location.pathname.startsWith('/admin')) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

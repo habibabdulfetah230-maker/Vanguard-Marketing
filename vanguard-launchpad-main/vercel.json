@@ -10,17 +10,16 @@
       "destination": "/api/$1"
     },
     {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
       "source": "/admin/(.*)",
-      "destination": "/admin/$1"
+      "destination": "/index.html"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "functions": {
-    "api/server.js": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  ]
 }
