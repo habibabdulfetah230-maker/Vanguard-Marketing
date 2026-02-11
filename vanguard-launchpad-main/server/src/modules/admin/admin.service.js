@@ -1,9 +1,12 @@
-import mockData from '../../config/mockDatabase.js';
+import Admin from '../auth/admin.model.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // Get all admins
 const getAllAdmins = async () => {
   try {
-    return mockData.admins;
+    const admins = await Admin.find({}).select('-password').sort({ createdAt: -1 });
+    return admins;
   } catch (error) {
     throw new Error('Failed to fetch admins: ' + error.message);
   }
@@ -12,7 +15,7 @@ const getAllAdmins = async () => {
 // Get admin by ID
 const getAdminById = async (id) => {
   try {
-    const admin = mockData.admins.find(a => a._id === id);
+    const admin = await Admin.findById(id).select('-password');
     if (!admin) {
       throw new Error('Admin not found');
     }
@@ -28,23 +31,21 @@ const createAdmin = async (adminData) => {
     const { email, name, role = 'admin' } = adminData;
     
     // Check if admin already exists
-    const existingAdmin = mockData.admins.find(a => a.email === email);
+    const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
       throw new Error('Admin with this email already exists');
     }
     
     // Create new admin
-    const newAdmin = {
-      _id: Date.now().toString(),
+    const newAdmin = new Admin({
       email,
       name,
       role,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+      password: adminData.password, // Will be hashed by pre-save hook
+      isActive: true
+    });
     
-    mockData.admins.push(newAdmin);
+    await newAdmin.save();
     return newAdmin;
   } catch (error) {
     throw new Error('Failed to create admin: ' + error.message);
@@ -54,18 +55,19 @@ const createAdmin = async (adminData) => {
 // Update admin
 const updateAdmin = async (id, updateData) => {
   try {
-    const adminIndex = mockData.admins.findIndex(a => a._id === id);
-    if (adminIndex === -1) {
+    const admin = await Admin.findById(id);
+    if (!admin) {
       throw new Error('Admin not found');
     }
     
     // Don't allow password updates through this method
     const { password, ...safeUpdateData } = updateData;
     
-    Object.assign(mockData.admins[adminIndex], safeUpdateData);
-    mockData.admins[adminIndex].updatedAt = new Date().toISOString();
+    Object.assign(admin, safeUpdateData);
+    admin.updatedAt = new Date();
     
-    return mockData.admins[adminIndex];
+    await admin.save();
+    return admin;
   } catch (error) {
     throw new Error('Failed to update admin: ' + error.message);
   }
@@ -74,15 +76,16 @@ const updateAdmin = async (id, updateData) => {
 // Toggle admin status
 const toggleAdminStatus = async (id) => {
   try {
-    const adminIndex = mockData.admins.findIndex(a => a._id === id);
-    if (adminIndex === -1) {
+    const admin = await Admin.findById(id);
+    if (!admin) {
       throw new Error('Admin not found');
     }
     
-    mockData.admins[adminIndex].isActive = !mockData.admins[adminIndex].isActive;
-    mockData.admins[adminIndex].updatedAt = new Date().toISOString();
+    admin.isActive = !admin.isActive;
+    admin.updatedAt = new Date();
     
-    return mockData.admins[adminIndex];
+    await admin.save();
+    return admin;
   } catch (error) {
     throw new Error('Failed to toggle admin status: ' + error.message);
   }
@@ -91,14 +94,13 @@ const toggleAdminStatus = async (id) => {
 // Delete admin
 const deleteAdmin = async (id) => {
   try {
-    const adminIndex = mockData.admins.findIndex(a => a._id === id);
-    if (adminIndex === -1) {
+    const admin = await Admin.findById(id);
+    if (!admin) {
       throw new Error('Admin not found');
     }
     
-    const deletedAdmin = mockData.admins[adminIndex];
-    mockData.admins.splice(adminIndex, 1);
-    return deletedAdmin;
+    await Admin.findByIdAndDelete(id);
+    return admin;
   } catch (error) {
     throw new Error('Failed to delete admin: ' + error.message);
   }
@@ -107,15 +109,16 @@ const deleteAdmin = async (id) => {
 // Change admin password
 const changeAdminPassword = async (id, newPassword) => {
   try {
-    const adminIndex = mockData.admins.findIndex(a => a._id === id);
-    if (adminIndex === -1) {
+    const admin = await Admin.findById(id);
+    if (!admin) {
       throw new Error('Admin not found');
     }
     
-    // In mock, we don't actually store passwords
-    mockData.admins[adminIndex].updatedAt = new Date().toISOString();
+    admin.password = newPassword; // Will be hashed by pre-save hook
+    admin.updatedAt = new Date();
     
-    return mockData.admins[adminIndex];
+    await admin.save();
+    return admin;
   } catch (error) {
     throw new Error('Failed to change password: ' + error.message);
   }
