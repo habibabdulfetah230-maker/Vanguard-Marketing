@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { getAllAdmins, getAdminById, createAdmin, updateAdmin, toggleAdminStatus, deleteAdmin, changeAdminPassword } = require('../modules/admin/admin.service');
-const authMiddleware = require('../middleware/authMiddleware');
-const requireAdmin = require('../middleware/requireAdmin');
+import { getAllAdmins, getAdminById, createAdmin, updateAdmin, toggleAdminStatus, deleteAdmin, changeAdminPassword } from '../modules/admin/admin.service.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import requireAdmin from '../middleware/requireAdmin.js';
 
 // Get all admins
 router.get('/', authMiddleware, requireAdmin, async (req, res, next) => {
@@ -79,4 +79,4 @@ router.patch('/:id/password', authMiddleware, requireAdmin, async (req, res, nex
   }
 });
 
-module.exports = router;
+export default router;
