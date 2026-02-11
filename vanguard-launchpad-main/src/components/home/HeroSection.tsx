@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { fetchStats } from "@/lib/api";
+import MediaAwareImage from "@/components/ui/MediaAwareImage";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 import heroImage from "@/assets/hero-business.jpg";
 
 const benefits = [
@@ -14,14 +18,24 @@ const benefits = [
 ];
 
 export const HeroSection = () => {
+  const { token } = useAdminAuth();
+  const { data: stats, isLoading, refetch } = useQuery({
+    queryKey: ["stats"],
+    queryFn: () => fetchStats(token),
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img
+        <MediaAwareImage
           src={heroImage}
           alt="Professional business team"
           className="w-full h-full object-cover"
+          fallback={
+            <div className="w-full h-full bg-gradient-to-br from-slate-900 to-slate-800" />
+          }
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/70" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
@@ -31,93 +45,85 @@ export const HeroSection = () => {
       <div className="container-wide relative z-10 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
           >
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20"
-            >
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-medium text-primary">
-                Results-Driven Marketing Agency
-              </span>
-            </motion.div>
-
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight tracking-tight">
-              We Scale Businesses Using{" "}
-              <span className="text-gradient">Strategic Digital Marketing</span>
+            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground mb-6">
+              Transform Your
+              <span className="text-gradient">Digital Presence</span>
             </h1>
-
-            {/* Subheadline */}
-            <p className="text-xl sm:text-2xl text-muted-foreground max-w-xl">
-              More customers. More visibility. Real growth.
+            <p className="text-xl lg:text-2xl text-muted-foreground mb-8 leading-relaxed">
+              We help businesses scale their reach, engage their audience, and
+              achieve measurable growth through strategic marketing.
             </p>
-
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/contact">
-                <Button variant="hero" size="lg" className="group">
-                  Book Free Strategy Call
+                <Button variant="heroOutline" size="lg" className="group">
+                  Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link to="/services">
-                <Button variant="heroOutline" size="lg">
-                  View Our Services
-                </Button>
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="flex flex-wrap gap-8 pt-4">
-              <div className="space-y-1">
-                <p className="text-3xl font-bold text-foreground">150+</p>
-                <p className="text-sm text-muted-foreground">Clients Scaled</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-3xl font-bold text-foreground">98%</p>
-                <p className="text-sm text-muted-foreground">Client Retention</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-3xl font-bold text-foreground">5M+</p>
-                <p className="text-sm text-muted-foreground">Leads Generated</p>
-              </div>
             </div>
           </motion.div>
 
-          {/* Benefits Card */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="hidden lg:block"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="space-y-6"
           >
-            <div className="card-premium p-8 backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-6 text-foreground">
-                Why Businesses Choose Vanguard
+            {/* Stats */}
+            <div className="flex flex-wrap gap-8 pt-4">
+              <div className="space-y-1">
+                <p className="text-3xl font-bold text-foreground">
+                  {isLoading ? "150+" : (stats?.clients_scaled || "150+")}
+                </p>
+                <p className="text-sm text-muted-foreground">Clients Scaled</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-3xl font-bold text-foreground">
+                  {isLoading ? "98%" : (stats?.client_retention || "98%")}
+                </p>
+                <p className="text-sm text-muted-foreground">Client Retention</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-3xl font-bold text-foreground">
+                  {isLoading ? "5M+" : (stats?.leads_generated || "5M+")}
+                </p>
+                <p className="text-sm text-muted-foreground">Leads Generated</p>
+              </div>
+            </div>
+
+            {/* Benefits Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="card-premium p-6"
+            >
+              <h3 className="text-xl font-semibold mb-4">
+                Why Choose <span className="text-gradient">Vanguard</span>?
               </h3>
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {benefits.map((benefit, index) => (
                   <motion.li
                     key={benefit}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    className="flex items-center gap-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                    className="flex items-start gap-3"
                   >
-                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                     <span className="text-muted-foreground">{benefit}</span>
                   </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>

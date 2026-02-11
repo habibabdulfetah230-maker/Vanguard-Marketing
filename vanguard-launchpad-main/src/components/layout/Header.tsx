@@ -10,7 +10,6 @@ const navLinks = [
   { name: "Portfolio", path: "/portfolio" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },
-  { name: "Admin", path: "/admin/login" },
 ];
 
 export const Header = () => {
@@ -67,9 +66,6 @@ export const Header = () => {
 
         {/* CTA Button */}
         <div className="hidden lg:flex items-center gap-4">
-          <Link to="/admin/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-             Login
-          </Link>
           <Link to="/contact">
             <Button variant="hero" size="default">
               <Phone className="w-4 h-4" />

@@ -6,6 +6,8 @@ import brandingRoutes from "./modules/branding/branding.routes.js";
 import fullProjectRoutes from "./modules/fullProject/fullProject.routes.js";
 import designRoutes from "./modules/design/design.routes.js";
 import testimonialRoutes from "./modules/testimonial/testimonial.routes.js";
+import mediaRoutes from "./routes/media.js";
+import statsRoutes from "./routes/stats.js";
 
 const router = Router();
 
@@ -17,5 +19,7 @@ router.use("/branding", brandingRoutes);
 router.use("/full-projects", fullProjectRoutes);
 router.use("/design", designRoutes);
 router.use("/testimonials", testimonialRoutes);
+router.use("/media", mediaRoutes);
+router.use("/stats", statsRoutes);
 
 export default router;

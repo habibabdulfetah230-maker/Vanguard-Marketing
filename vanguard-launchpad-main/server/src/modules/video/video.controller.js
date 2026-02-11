@@ -59,7 +59,16 @@ const listPublicVideoProjectsController = asyncHandler(async (_req, res) => {
 
 const listAdminVideoProjectsController = asyncHandler(async (_req, res) => {
   const projects = await listVideoProjects({ includeUnpublished: true });
-  res.status(200).json(projects);
+  const response = projects.map((project) => ({
+    id: project._id.toString(),
+    title: project.title,
+    description: project.description,
+    youtubeVideoId: project.youtubeVideoId,
+    isPublished: project.isPublished,
+    createdAt: project.createdAt,
+    updatedAt: project.updatedAt,
+  }));
+  res.status(200).json(response);
 });
 
 export {
