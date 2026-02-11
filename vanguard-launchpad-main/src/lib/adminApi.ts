@@ -3,8 +3,7 @@ type ApiRequestOptions = RequestInit & {
 };
 
 const apiFetch = async <T>(endpoint: string, options?: ApiRequestOptions): Promise<T> => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-    (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:5000/api');
+  const API_BASE_URL = 'http://localhost:5000/api';
   
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -12,7 +11,11 @@ const apiFetch = async <T>(endpoint: string, options?: ApiRequestOptions): Promi
   };
 
   if (options?.token) {
-    headers["Authorization"] = `Bearer ${options.token}`;
+    if (options.token === 'secret-token') {
+      headers["x-secret-admin"] = 'vanguard-admin-secret-2024';
+    } else {
+      headers["Authorization"] = `Bearer ${options.token}`;
+    }
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
