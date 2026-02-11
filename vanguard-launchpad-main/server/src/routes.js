@@ -8,6 +8,7 @@ import designRoutes from "./modules/design/design.routes.js";
 import testimonialRoutes from "./modules/testimonial/testimonial.routes.js";
 import mediaRoutes from "./routes/media.js";
 import statsRoutes from "./routes/stats.js";
+import adminRoutes from "./routes/admin.js";
 
 const router = Router();
 
@@ -21,5 +22,6 @@ router.use("/design", designRoutes);
 router.use("/testimonials", testimonialRoutes);
 router.use("/media", mediaRoutes);
 router.use("/stats", statsRoutes);
+router.use("/admin/users", adminRoutes);
 
 export default router;

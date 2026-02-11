@@ -3,11 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Upload, Image, Video, Trash2, Edit, Eye, EyeOff } from "lucide-react";
+import { Loader2, Upload, Image, Video, Trash2, Edit, Eye, EyeOff, Users, Plus, Trash, Key } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchMediaSettings, updateMediaSettings, fetchMediaItems, uploadMedia, updateMediaItem, deleteMediaItem, type MediaSettings, type MediaItem } from "@/lib/mediaApi";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { fetchAdmins, createAdmin, updateAdmin, toggleAdminStatus, deleteAdmin, changeAdminPassword, type AdminUser, type CreateAdminPayload, type UpdateAdminPayload } from "@/lib/adminApi";
 
 const AdminSystemSettings = () => {
   const { token } = useAdminAuth();
@@ -25,6 +26,17 @@ const AdminSystemSettings = () => {
     queryKey: ["media-items"],
     queryFn: fetchMediaItems,
   });
+
+  const { data: admins, isLoading: adminsLoading } = useQuery({
+    queryKey: ["admins"],
+    queryFn: fetchAdmins,
+  });
+
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminName, setNewAdminName] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [newAdminRole, setNewAdminRole] = useState<'admin' | 'superadmin'>('admin');
+  const [showAddAdmin, setShowAddAdmin] = useState(false);
 
   const settingsMutation = useMutation({
     mutationFn: updateMediaSettings,
@@ -53,6 +65,58 @@ const AdminSystemSettings = () => {
       toast({ title: "Media item updated" });
     },
   });
+
+  const createAdminMutation = useMutation({
+    mutationFn: (payload: CreateAdminPayload) => createAdmin(token, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      toast({ title: "Admin created successfully" });
+      setNewAdminEmail('');
+      setNewAdminName('');
+      setNewAdminPassword('');
+      setNewAdminRole('admin');
+      setShowAddAdmin(false);
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to create admin", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const toggleAdminMutation = useMutation({
+    mutationFn: (id: string) => toggleAdminStatus(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      toast({ title: "Admin status updated" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to update admin status", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteAdminMutation = useMutation({
+    mutationFn: (id: string) => deleteAdmin(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+      toast({ title: "Admin deleted successfully" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to delete admin", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleCreateAdmin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminEmail || !newAdminName || !newAdminPassword) {
+      toast({ title: "Please fill all fields", variant: "destructive" });
+      return;
+    }
+    createAdminMutation.mutate({
+      email: newAdminEmail,
+      name: newAdminName,
+      password: newAdminPassword,
+      role: newAdminRole,
+    });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: deleteMediaItem,
@@ -167,19 +231,78 @@ const AdminSystemSettings = () => {
             ) : (
               <Upload className="mr-2 h-4 w-4" />
             )}
-            Upload Media
           </Button>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Media Library */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Media Library</CardTitle>
-          <CardDescription>
-            Manage your uploaded images and videos
-          </CardDescription>
-        </CardHeader>
+        {showAddAdmin && (
+          <div className="border rounded-lg p-4 space-y-4 bg-slate-50">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="admin-email" className="text-sm font-medium">Email</label>
+                <input
+                  id="admin-email"
+                  type="email"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  placeholder="admin@example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="admin-name" className="text-sm font-medium">Name</label>
+                <input
+                  id="admin-name"
+                  type="text"
+                  value={newAdminName}
+                  onChange={(e) => setNewAdminName(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Admin Name"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="admin-password" className="text-sm font-medium">Password</label>
+                <input
+                  id="admin-password"
+                  type="password"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="admin-role" className="text-sm font-medium">Role</label>
+                <select
+                  id="admin-role"
+                  value={newAdminRole}
+                  onChange={(e) => setNewAdminRole(e.target.value as 'admin' | 'superadmin')}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="superadmin">Super Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                onClick={handleCreateAdmin}
+                disabled={createAdminMutation.isPending}
+              >
+                {createAdminMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4 mr-2" />
+                )}
+                Create Admin
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Admin List */}
+        <div className="space-y-4">
+          {adminsLoading ? (
+            <div className="flex justify-center py-8">
         <CardContent>
           {mediaLoading ? (
             <div className="flex h-64 items-center justify-center">
