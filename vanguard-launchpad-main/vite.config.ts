@@ -7,10 +7,10 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/' : '/',
   server: {
     host: "0.0.0.0",
-    port: 8080,
+    port: 5173,
     hmr: {
       host: "localhost",
-      clientPort: 8080,
+      clientPort: 5173,
       protocol: "ws",
       overlay: false,
     },

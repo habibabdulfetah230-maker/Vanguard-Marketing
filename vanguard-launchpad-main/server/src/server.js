@@ -2,7 +2,6 @@ import http from "http";
 import app from "./app.js";
 import env from "./config/env.js";
 import connectDatabase from "./config/database.js";
-import { resetAdmin } from "./modules/auth/auth.service.js";
 
 let server;
 
@@ -10,9 +9,8 @@ const startServer = async () => {
   try {
     await connectDatabase();
 
-    // Reset/create admin with known credentials
-    const adminCredentials = await resetAdmin();
-    console.log("[server] Admin credentials:", adminCredentials);
+    // Skip admin reset for now to avoid startup issues
+    console.log("[server] Skipping admin reset");
 
     server = http.createServer(app);
 
