@@ -33,10 +33,19 @@ const loginAdmin = async ({ email, password }) => {
 
 const ensureDefaultAdmin = async ({ email, password, name }) => {
   const existing = await Admin.findOne({ email });
-  if (existing) return existing;
+  if (existing) {
+    console.log(`[auth] Admin user already exists: ${email}`);
+    return existing;
+  }
 
-  const admin = new Admin({ email, password, name });
+  const admin = new Admin({ 
+    email, 
+    password, 
+    name,
+    role: 'admin'
+  });
   await admin.save();
+  console.log(`[auth] Created default admin user: ${email}`);
   return admin;
 };
 
