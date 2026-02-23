@@ -68,7 +68,7 @@ export const Header = () => {
         <div className="hidden lg:flex items-center gap-4">
           <Link to="/admin/login">
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              Admin Login
+              Login
             </Button>
           </Link>
           <Link to="/contact">
@@ -113,7 +113,7 @@ export const Header = () => {
               ))}
               <Link to="/admin/login" className="mt-4">
                 <Button variant="outline" size="lg" className="w-full">
-                  Admin Login
+                  Login
                 </Button>
               </Link>
               <Link to="/contact">
