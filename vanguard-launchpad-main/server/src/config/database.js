@@ -18,10 +18,11 @@ const connectDatabase = async () => {
 
     console.log("[database] Connecting to MongoDB...");
     
-    // Try to connect with a shorter timeout
+    // Try to connect with proper authentication settings
     await mongoose.connect(env.mongoUri, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
+      authSource: 'admin', // Specify auth source
     });
 
     isConnected = true;
@@ -32,7 +33,7 @@ const connectDatabase = async () => {
     console.error("[database] MongoDB connection error:", error.message);
     
     // If MongoDB Atlas fails, try local fallback
-    if (error.message.includes('ECONNREFUSED') || error.message.includes('querySrv')) {
+    if (error.message.includes('ECONNREFUSED') || error.message.includes('querySrv') || error.message.includes('ENOTFOUND')) {
       console.log("[database] Trying local MongoDB fallback...");
       
       try {
@@ -50,6 +51,14 @@ const connectDatabase = async () => {
         console.error("[database] To fix: Install MongoDB locally OR whitelist your IP in MongoDB Atlas");
         return false;
       }
+    }
+    
+    // If it's an authentication error, don't try local fallback
+    if (error.message.includes('bad auth') || error.message.includes('Authentication failed')) {
+      console.error("[database] ⚠️  Authentication failed - check your MongoDB credentials");
+      console.error("[database] Username and password in MONGODB_URI may be incorrect");
+      console.error("[database] Or the database user may not have proper permissions");
+      return false;
     }
     
     console.error("[database] ⚠️  Running without database - API calls will fail");

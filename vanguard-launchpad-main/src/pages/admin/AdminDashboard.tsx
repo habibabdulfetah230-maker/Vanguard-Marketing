@@ -19,32 +19,44 @@ const AdminDashboard = () => {
     queryKey: ["admin-video-projects"],
     queryFn: () => fetchAdminVideoProjects(token),
     enabled: !!token,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const { data: branding } = useQuery({
     queryKey: ["branding-items"],
     queryFn: fetchBrandingItems,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const { data: design } = useQuery({
     queryKey: ["design-items"],
     queryFn: fetchDesignItems,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const { data: fullProjects } = useQuery({
     queryKey: ["full-projects"],
     queryFn: fetchFullProjects,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const { data: testimonials } = useQuery({
     queryKey: ["testimonials"],
     queryFn: fetchTestimonials,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const { data: messages } = useQuery({
     queryKey: ["contact-submissions", token],
     queryFn: () => fetchContactSubmissions(token),
     enabled: !!token,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const stats = [
