@@ -16,15 +16,9 @@ const buildHeaders = (options?: ApiRequestOptions) => {
 const apiFetch = async <TResponse>(path: string, options?: ApiRequestOptions): Promise<TResponse> => {
   const headers = buildHeaders(options);
   
-  // Check if using secret token access
-  const urlParams = new URLSearchParams(window.location.search);
-  const secretToken = urlParams.get('token');
-  
-  if (options?.token && options.token !== 'secret-token') {
+  // Add authorization header if token is provided
+  if (options?.token) {
     headers.set("Authorization", `Bearer ${options.token}`);
-  } else if (secretToken === 'vanguard-admin-secret-2024' || options?.token === 'secret-token') {
-    // For secret token access, use a special header or skip auth
-    headers.set("X-Secret-Admin", "vanguard-admin-secret-2024");
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {

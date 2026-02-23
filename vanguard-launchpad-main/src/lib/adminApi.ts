@@ -11,11 +11,7 @@ const apiFetch = async <T>(endpoint: string, options?: ApiRequestOptions): Promi
   };
 
   if (options?.token) {
-    if (options.token === 'secret-token') {
-      headers["x-secret-admin"] = 'vanguard-admin-secret-2024';
-    } else {
-      headers["Authorization"] = `Bearer ${options.token}`;
-    }
+    headers["Authorization"] = `Bearer ${options.token}`;
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {

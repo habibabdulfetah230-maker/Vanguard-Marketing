@@ -29,56 +29,28 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const [admin, setAdmin] = useState<AdminInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for secret token in URL on mount and when URL changes
+  // Load auth state from localStorage on mount
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
-    const checkAuth = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const secretToken = urlParams.get('token');
-      
-      if (secretToken === 'vanguard-admin-secret-2024') {
-        // Set mock admin for secret token access
-        setToken('secret-token');
-        setAdmin({
-          id: 'secret-admin',
-          email: 'admin@vanguard.com',
-          name: 'Secret Admin',
-          role: 'superadmin'
-        });
-        setIsLoading(false);
-        return;
+
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as { token?: string; admin?: AdminInfo };
+      if (parsed?.token) {
+        setToken(parsed.token);
+        setAdmin(parsed.admin ?? null);
       }
-
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const parsed = JSON.parse(stored) as { token?: string; admin?: AdminInfo };
-        if (parsed?.token) {
-          setToken(parsed.token);
-          setAdmin(parsed.admin ?? null);
-        }
-      } catch (error) {
-        console.warn("[AdminAuth] Failed to parse stored auth state", error);
-        window.localStorage.removeItem(STORAGE_KEY);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-
-    // Listen for URL changes (for single-page navigation)
-    const handleLocationChange = () => checkAuth();
-    window.addEventListener('popstate', handleLocationChange);
-    
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-    };
+    } catch (error) {
+      console.warn("[AdminAuth] Failed to parse stored auth state", error);
+      window.localStorage.removeItem(STORAGE_KEY);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {

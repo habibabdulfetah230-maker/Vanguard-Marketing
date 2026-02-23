@@ -23,6 +23,7 @@ import AdminMessages from "./pages/admin/AdminMessages";
 import AdminClearAll from "./pages/admin/AdminClearAll";
 import AdminSystemSettings from "./pages/admin/AdminSystemSettings";
 import AdminStats from "./pages/admin/AdminStats";
+import AdminLogin from "./pages/admin/AdminLogin";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
